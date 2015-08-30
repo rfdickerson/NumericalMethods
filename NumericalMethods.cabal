@@ -1,0 +1,28 @@
+name: NumericalMethods
+version: 0.0.1
+cabal-version: 1.12
+build-type: Simple
+license: AllRightsReserved
+description:
+    Used to learn how to do numerical methods.
+
+executable NumericalMethods
+    main-is: Main.hs
+    build-depends:
+        QuickCheck -any,
+        base -any,
+        doctest -any
+    default-language: Haskell2010
+    hs-source-dirs: src
+    ghc-options: -ferror-spans
+
+test-suite test-NumericalMethods
+    type: exitcode-stdio-1.0
+    main-is: Main.hs
+    build-depends:
+        QuickCheck -any,
+        base -any,
+        doctest -any
+    default-language: Haskell2010
+    hs-source-dirs: test
+    ghc-options: -ferror-spans
