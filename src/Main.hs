@@ -50,6 +50,10 @@ mysqrt a x
         difference = abs(newguess - x)
         epsilon = 0.02
 
+deriv :: (RealFloat a) => (a->a) -> (a->a)
+deriv f x = (f (x + dx) - f x) / dx
+    where dx = 0.001*x
+
 g :: (RealFloat a) => a -> a
 g x = x^3 - 4*x + 1
 
