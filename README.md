@@ -2,4 +2,5 @@
 Learning Haskell and Numerical Methods
 
 Current implementations:
-- Newton-Rapson method for root finding.
+- Approximation for the derivative of a function
+- Newton-Raphson iterative method for root finding.
