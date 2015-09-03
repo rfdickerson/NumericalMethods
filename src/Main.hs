@@ -35,22 +35,22 @@ main = putStrLn (hello "World")
 
 newtonRaphson :: (RealFloat a) => a -> (a -> a) -> a
 newtonRaphson guess f
-    | difference <= epsilon = newguess
-    | otherwise = newtonRaphson newguess f
-    where
-        newguess = guess - f guess/fprime guess
-        difference = abs(newguess - guess)
-        epsilon = 0.002
-        fprime = deriv f
+  | difference <= epsilon = newguess
+  | otherwise = newtonRaphson newguess f
+  where
+    newguess = guess - f guess/fprime guess
+    difference = abs(newguess - guess)
+    epsilon = 0.002
+    fprime = deriv f
 
 mysqrt :: (RealFloat a) => a -> a -> a
 mysqrt a x
-    | difference <= epsilon = newguess
-    | otherwise = mysqrt a newguess
-    where
-        newguess = 1 / 2 * (x + a/x)
-        difference = abs(newguess - x)
-        epsilon = 0.02
+  | difference <= epsilon = newguess
+  | otherwise = mysqrt a newguess
+  where
+    newguess = 1 / 2 * (x + a/x)
+    difference = abs(newguess - x)
+    epsilon = 0.02
 
 deriv :: (RealFloat a) => (a->a) -> a -> a
 deriv f x = (f (x + dx) - f x) / dx
@@ -70,12 +70,24 @@ euler f yzero xzero = yzero + h * f yzero xzero
 -- Modified Euler method
 eulerModified :: (RealFloat a) => (a->a->a) -> a -> a -> a
 eulerModified f y0 x0 = y0 + h/2 * ( yp0 + yp1)
-    where
+  where
     yp0 = f y0 x0
     yp1 = euler f y0 x0
     h = 0.0001
 
+mag :: (RealFloat a) => [a] -> a
+mag [] = 0
+mag v = sqrt(sumsqr)
+  where sumsqr = foldr (\x y -> x^2 + y) 0 v
 
--- gprime :: (RealFloat a) => a -> a
+dot :: (RealFloat a) => [a] -> [a] -> a
+dot [] [] = 0
+dot (x:xs) (y:ys) = x*y + dot xs ys
+
+angle :: (RealFloat a) => [a] -> [a] -> a
+angle a b = acos(t)
+  where t = (dot a b) / (mag a * mag b)
+
+  -- gprime :: (RealFloat a) => a -> a
 -- gprime x = 3*x^2 - 4
 
