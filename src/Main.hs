@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 --
 -- Module      :  Main
--- Copyright   :
+-- Copyright   :  
 -- License     :  AllRightsReserved
 --
 -- Maintainer  : Robert F. Dickerson
@@ -14,30 +14,33 @@
 
 
 
-module Main (
-    main,
-    mysqrt,
-    newtonRaphson,
-    deriv,
-    eulerBackwards
-) where
+module Main where
 
--- This strang looking comment adds code only needed when running the
--- doctest tests embedded in the comments
--- $setup
--- >>> import Data.List (stripPrefix)
+-- | Acceleration due to gravit.
+gravityAccel :: Double
+gravityAccel = 9.8
 
--- | Simple function to create a hello message.
--- prop> stripPrefix "Hello " (hello s) == Just s
-hello :: String -> String
-hello s = "Hello " ++ s
+printAngle :: Maybe Double -> String
+printAngle x = case x of
+             Just r -> show (r)
+             Nothing -> "Bad angles"
 
 epsilon :: Double
 epsilon = 0.002
 
+type Position = (Double, Double)
+type Force = (Double, Double)
+type Velocity = (Double, Double)
+
+data Particle
+  =
+    Bead
+    !Position
+    !Velocity
+    deriving Show
+
 main :: IO ()
-main = putStrLn (hello "World")
--- main = putStrLn (mysqrt 2 1)
+main = putStrLn (printAngle (angle [3,7] [5,6]))
 
 newtonRaphson :: Double -> (Double -> Double) -> Double
 newtonRaphson guess f
