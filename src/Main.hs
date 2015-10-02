@@ -1,10 +1,10 @@
 -----------------------------------------------------------------------------
 --
 -- Module      :  Main
--- Copyright   :
+-- Copyright   :  
 -- License     :  AllRightsReserved
 --
--- Maintainer  :
+-- Maintainer  : Robert F. Dickerson
 -- Stability   :
 -- Portability :
 --
@@ -12,46 +12,53 @@
 --
 -----------------------------------------------------------------------------
 
-module Main (
-    main,
-    mysqrt,
-    newtonRaphson,
-    deriv,
-    infinitelist
-) where
 
--- This strang looking comment adds code only needed when running the
--- doctest tests embedded in the comments
--- $setup
--- >>> import Data.List (stripPrefix)
 
--- | Simple function to create a hello message.
--- prop> stripPrefix "Hello " (hello s) == Just s
-hello :: String -> String
-hello s = "Hello " ++ s
+module Main where
+
+-- | Acceleration due to gravit.
+gravityAccel :: Double
+gravityAccel = 9.8
+
+printAngle :: Maybe Double -> String
+printAngle x = case x of
+             Just r -> show (r)
+             Nothing -> "Bad angles"
+
+epsilon :: Double
+epsilon = 0.002
+
+type Position = (Double, Double)
+type Force = (Double, Double)
+type Velocity = (Double, Double)
+
+data Particle
+  =
+    Bead
+    !Position
+    !Velocity
+    deriving Show
 
 main :: IO ()
-main = putStrLn (hello "World")
--- main = putStrLn (mysqrt 2 1)
+main = putStrLn (printAngle (angle [3,7] [5,6]))
 
-newtonRaphson :: (RealFloat a) => a -> (a -> a) -> a
+newtonRaphson :: Double -> (Double -> Double) -> Double
 newtonRaphson guess f
   | difference <= epsilon = newguess
   | otherwise = newtonRaphson newguess f
   where
     newguess = guess - f guess/fprime guess
     difference = abs(newguess - guess)
-    epsilon = 0.002
     fprime = deriv f
 
-mysqrt :: (RealFloat a) => a -> a -> a
+mysqrt :: Double -> Double -> Double
 mysqrt a x
   | difference <= epsilon = newguess
   | otherwise = mysqrt a newguess
   where
     newguess = 1 / 2 * (x + a/x)
     difference = abs(newguess - x)
-    epsilon = 0.02
+
 
 deriv :: (RealFloat a) => (a->a) -> a -> a
 deriv f x = (f (x + dx) - f x) / dx
@@ -67,7 +74,19 @@ deriv f x = (f (x + dx) - f x) / dx
 -- Euler method
 euler :: (Double->Double) -> Double -> Double
 euler f y0 = y0 + h * f y0
-    where h = 0.001
+    where h = 0.1
+          
+-- Backwards Euler --------------------
+eulerBackwards :: 
+	(Double->Double) -> 
+	Double -> 
+	Double
+
+eulerBackwards f y0 = newtonRaphson guess g
+  where 
+    h = 0.002
+    guess = euler f y0
+    g = (\x -> x - y0 - h*f x)
 
 
 infinitelist = 1.0 : map (+ 0.01) infinitelist
@@ -76,7 +95,7 @@ infinitelist = 1.0 : map (+ 0.01) infinitelist
 eulerIter :: (Double->Double) -> Double -> [Double]
 eulerIter f y0 = y0 : eulerIter f yp 
   where 
-    yp = euler f y0 
+    yp = eulerBackwards f y0 
 
 {-eulerIter :: (Double->Double) -> Double -> Double -> [(Double,Double)]
 eulerIter f x0 y0 = x
@@ -96,12 +115,12 @@ eulerModified f y0 x0 = y0 + h/2 * ( yp0 + yp1)
     h = 0.0001
 -}
 
-mag :: (RealFloat a) => [a] -> a
+mag :: [Double] -> Double
 mag [] = 0
 mag v = sqrt(sumsqr)
   where sumsqr = foldr (\x y -> x^2 + y) 0 v
 
-dot :: (RealFloat a) => [a] -> [a] -> Maybe a
+dot :: [Double] -> [Double] -> Maybe Double
 dot [] [] = Just 0.0
 dot (x:xs) [] = Nothing
 dot [] (x:xs) = Nothing
@@ -112,11 +131,14 @@ dot (x:xs) (y:ys) =  case dot xs ys of
 myreverse :: [Char] -> [Char]
 myreverse [] = []
 myreverse (x:xs) = myreverse xs ++ [x]
-{-
-angle :: (RealFloat a) => [a] -> [a] -> Maybe a
-angle a b = acos(t)
-  where t = (dot a b) / (mag a * mag b)
--}
+
+
+angle :: [Double] -> [Double] -> Maybe Double
+angle a b = case dot a b of
+  Just r -> Just( acos (r / (mag a * mag b)))
+  Nothing -> Nothing
+
+
 
   -- gprime :: (RealFloat a) => a -> a
 -- gprime x = 3*x^2 - 4
