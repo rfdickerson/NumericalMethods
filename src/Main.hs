@@ -67,12 +67,13 @@ deriv f x = (f (x + dx) - f x) / dx
 -- Euler method
 euler :: (Double->Double) -> Double -> Double
 euler f y0 = y0 + h * f y0
-    where h = 0.1
+    where h = 0.001
 
 
 infinitelist = 1.0 : map (+ 0.01) infinitelist
 -- function, x0, y0
 
+eulerIter :: (Double->Double) -> Double -> [Double]
 eulerIter f y0 = y0 : eulerIter f yp 
   where 
     yp = euler f y0 
