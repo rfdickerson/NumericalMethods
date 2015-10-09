@@ -2,7 +2,7 @@
 --
 -- Module      :  Main
 -- Copyright   :  
--- License     :  AllRightsReserved
+-- License     :  MIT License
 --
 -- Maintainer  : Robert F. Dickerson
 -- Stability   :
@@ -16,7 +16,7 @@
 
 module Main where
 
--- | Acceleration due to gravit.
+-- | Acceleration due to gravity.
 gravityAccel :: Double
 gravityAccel = 9.8
 
@@ -28,9 +28,25 @@ printAngle x = case x of
 epsilon :: Double
 epsilon = 0.002
 
+
 type Position = (Double, Double)
 type Force = (Double, Double)
 type Velocity = (Double, Double)
+type Vertex = (Double, Double)
+
+--data TriangleInfo = 
+--  Triangle {a :: Vertex, b :: Vertex, c :: Vertex}
+--    deriving (Show)
+
+data TriangleInfo =
+  Triangle Vertex Vertex Vertex
+    deriving (Show)
+
+subVector :: Vertex -> Vertex -> Vertex
+subVector v0 v1 = (fst v0 - fst v1, snd v0 - snd v1)
+
+areaTriangle :: Triangle -> Double
+areaTriangle a = 0.5 * 
 
 data Particle
   =
@@ -138,7 +154,7 @@ angle a b = case dot a b of
   Just r -> Just( acos (r / (mag a * mag b)))
   Nothing -> Nothing
 
-
+ 
 
   -- gprime :: (RealFloat a) => a -> a
 -- gprime x = 3*x^2 - 4
