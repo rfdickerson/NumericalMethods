@@ -39,21 +39,21 @@ type Vertex = (Double, Double)
 --    deriving (Show)
 
 data TriangleInfo =
-  Triangle Vertex Vertex Vertex
+    Triangle Vertex Vertex Vertex
     deriving (Show)
 
 subVector :: Vertex -> Vertex -> Vertex
 subVector v0 v1 = (fst v0 - fst v1, snd v0 - snd v1)
 
-areaTriangle :: Triangle -> Double
-areaTriangle a = 0.5 * 
+-- areaTriangle :: Triangle -> Double
+-- areaTriangle a = 0.5 * 
 
 data Particle
-  =
-    Bead
-    !Position
-    !Velocity
-    deriving Show
+    =
+      Bead
+      !Position
+      !Velocity
+       deriving Show
 
 main :: IO ()
 main = putStrLn (printAngle (angle [3,7] [5,6]))
