@@ -39,11 +39,30 @@ type Vertex = (Double, Double)
 --    deriving (Show)
 
 data TriangleInfo =
-    Triangle Vertex Vertex Vertex
-    deriving (Show)
+  Triangle Vertex Vertex Vertex
+  deriving (Show)
 
 subVector :: Vertex -> Vertex -> Vertex
 subVector v0 v1 = (fst v0 - fst v1, snd v0 - snd v1)
+
+
+-- binary tree
+data Tree a = Node a (Tree a) (Tree a)
+              | Empty
+              deriving (Show, Eq)
+
+-- example tree
+someTree = Node 5 (Node 3 Empty Empty) (Node 2 Empty Empty)
+
+-- search the binary tree for an element
+searchTree :: Eq a => a -> Tree a -> Bool
+searchTree e (Node c l r) = if c == e
+                               then True
+                            else
+                               searchTree e l || searchTree e r
+                                    
+searchTree element Empty = False
+              
 
 -- areaTriangle :: Triangle -> Double
 -- areaTriangle a = 0.5 * 
