@@ -16,6 +16,15 @@ module Main where
 
 import Data.List
 import System.IO
+import System.Environment
+import Control.Applicative
+
+main = do
+  -- let d = take 100 $ eulerIter (\x -> 9.8) exampleVector1
+  let d = fmap (eulerBackwards (\x -> 9.8) 0.005) exampleVector1
+  let s = showValues [d]
+  putStrLn s
+  writeFile "data.txt" s
 
 -- | Acceleration due to gravity.
 gravityAccel :: Double
@@ -35,6 +44,22 @@ type Force = (Double, Double)
 type Velocity = (Double, Double)
 type Vertex = (Double, Double)
 type Mass = Double
+
+data Vector a = Vector a a a deriving (Show, Eq)
+
+instance Functor Vector where
+  fmap f (Vector a b c) = Vector (f a) (f b) (f c)
+
+--instance Applicative Vector where
+--  pure = Vector
+
+--instance Num Vector where
+--  (+) (Vector a b c) (Vector i j k) = Vector (a + i) (b + j) (c + k)
+
+-- exampleVector :: Vector
+exampleVector1 = Vector 1.1 2.2 3.3
+
+exampleVector2 = Vector 5.6 7.8 9.0
 
 --data TriangleInfo =
 --  Triangle {a :: Vertex, b :: Vertex, c :: Vertex}
@@ -81,8 +106,7 @@ data Ball
       !Velocity
        deriving (Show, Eq)
 
-main :: IO ()
-main = putStrLn (printAngle (angle [3,7] [5,6]))
+
 
 newtonRaphson :: Double -> (Double -> Double) -> Double
 newtonRaphson guess f
@@ -93,6 +117,12 @@ newtonRaphson guess f
     difference = abs(newguess - guess)
     fprime = derivative f
 
+
+optimize :: RealFunction -> Double -> Double
+optimize f guess = newtonRaphson guess g
+  where g = (\x -> derivative2 f x / deriv_second f x)
+
+
 mysqrt :: Double -> Double -> Double
 mysqrt a x
   | difference <= epsilon = newguess
@@ -102,9 +132,25 @@ mysqrt a x
     difference = abs(newguess - x)
 
 -- returns an approximation of the derivative
-derivative :: (Double->Double) -> (Double->Double)
-derivative f = (\x -> (f (x + epsilon) - f x)/epsilon)
+derivative :: RealFunction -> RealFunction
+derivative f x = (f (x + epsilon) - f x)/epsilon
 
+-- returns an approximation of the derivative using the symmetric difference
+-- quotient
+derivative2 :: RealFunction -> RealFunction
+derivative2 f x = (f (x + epsilon) - f (x - epsilon)) / (2*epsilon)
+
+-- finite central differences
+derivative3 :: RealFunction -> RealFunction
+derivative3 f x = (d - 8*c + 8*b - a)/(12*epsilon)
+      where
+      a = f (x + 2*epsilon)
+      b = f (x + epsilon)
+      c = f (x - epsilon)
+      d = f (x - 2*epsilon)
+
+deriv_second :: RealFunction -> RealFunction
+deriv_second f x = (f (x + epsilon) - 2*f(x) + f(x - epsilon) ) / epsilon**2
 
 deriv :: (Double->Double) -> Double -> Double
 deriv f x = (f (x + dx) - f x) / dx
@@ -140,7 +186,7 @@ initBall = Ball 5 (0,0) (0, 0) (1, 0)
 -- differential equation, starting y, timestep
 eulerIter :: RealFunction -> Double -> Double -> [Double]
 eulerIter f h y0 =
-  let it y = eulerBackwards f h y
+  let it y = euler f h y
   in
     iterate it y0
 
@@ -148,9 +194,9 @@ eulerIter f h y0 =
 euler :: RealFunction -> Double -> Double -> Double
 euler f h y0 = y0 + h * f y0
 
--- Backwards Euler --------------------
+-- | The 'eulerBackwards' function takes the implicit Euler of a function.
 eulerBackwards ::
-    (Double->Double) ->
+    RealFunction ->
     Double ->
     Double ->
     Double
@@ -158,11 +204,16 @@ eulerBackwards ::
 eulerBackwards f h y0 = newtonRaphson guess g
   where
     guess = euler f h y0
-    g = (\x -> x - y0 - h*f x)
+    g = (\x -> x - y0 - h*(f x))
 
-
+infinitelist :: [Double]
 infinitelist = 1.0 : map (+ 0.01) infinitelist
 -- function, x0, y0
+
+showValues :: Show a => [a] -> String
+showValues x = intercalate "\n" $ map show x
+
+
 
 --eulerIter :: (Double->Double) -> Double -> [Double]
 --eulerIter f y0 = y0 : eulerIter f yp
