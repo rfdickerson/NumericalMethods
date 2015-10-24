@@ -1,30 +1,8 @@
------------------------------------------------------------------------------
---
--- Module      :  Main
--- Copyright   :
--- License     :  MIT License
---
--- Maintainer  : Robert F. Dickerson
--- Stability   :
--- Portability :
---
--- |
---
------------------------------------------------------------------------------
+{-# LANGUAGE Haskell2010, TemplateHaskell, QuasiQuotes, CPP #-}
 
-module Main where
+module NumericalMethods.Simple where
 
 import Data.List
-import System.IO
-import System.Environment
-import Control.Applicative
-
-main = do
-  -- let d = take 100 $ eulerIter (\x -> 9.8) exampleVector1
-  let d = fmap (eulerBackwards (\x -> 9.8) 0.005) exampleVector1
-  let s = showValues [d]
-  putStrLn s
-  writeFile "data.txt" s
 
 -- | Acceleration due to gravity.
 gravityAccel :: Double
@@ -56,15 +34,13 @@ instance Functor Vector where
 --instance Num Vector where
 --  (+) (Vector a b c) (Vector i j k) = Vector (a + i) (b + j) (c + k)
 
--- exampleVector :: Vector
+exampleVector1 :: Vector Double
 exampleVector1 = Vector 1.1 2.2 3.3
 
+exampleVector2 :: Vector Double
 exampleVector2 = Vector 5.6 7.8 9.0
 
---data TriangleInfo =
---  Triangle {a :: Vertex, b :: Vertex, c :: Vertex}
---    deriving (Show)
-
+-- | Triangle data structure.
 data TriangleInfo =
   Triangle Vertex Vertex Vertex
   deriving (Show)
@@ -78,20 +54,22 @@ data Tree a = Node a (Tree a) (Tree a)
               | Empty
               deriving (Show, Eq)
 
--- example tree
+-- | example tree
+someTree :: Tree Int
 someTree = Node 5 (Node 3 Empty Empty) (Node 2 Empty Empty)
 
--- search the binary tree for an element
+-- | search a binary tree for an element.
 searchTree :: Eq a => a -> Tree a -> Bool
 searchTree e (Node c l r)
     | c == e = True
     | otherwise = searchTree e l || searchTree e r
 
 
-searchTree element Empty = False
+searchTree _ Empty = False
 
-hypotenuse l w = sqrt squaredH
-  where squaredH = l^2 +w^2
+-- hypotenuse :: Floating a => a -> a -> a
+-- hypotenuse l w = sqrt squaredH
+--   where squaredH = l^2 +w^2
 
 
 -- areaTriangle :: Triangle -> Double
@@ -107,7 +85,7 @@ data Ball
        deriving (Show, Eq)
 
 
-
+-- | Newton-Raphson method for finding roots.
 newtonRaphson :: Double -> (Double -> Double) -> Double
 newtonRaphson guess f
   | difference <= epsilon = newguess
@@ -117,12 +95,12 @@ newtonRaphson guess f
     difference = abs(newguess - guess)
     fprime = derivative f
 
-
+-- | Newton's method for finding optimization of functions.
 optimize :: RealFunction -> Double -> Double
 optimize f guess = newtonRaphson guess g
   where g = (\x -> derivative2 f x / deriv_second f x)
 
-
+-- | Numerical method for finding the square root.
 mysqrt :: Double -> Double -> Double
 mysqrt a x
   | difference <= epsilon = newguess
@@ -131,16 +109,17 @@ mysqrt a x
     newguess = (1 / 2) * (x + a/x)
     difference = abs(newguess - x)
 
--- returns an approximation of the derivative
+-- | returns an approximation of the derivative
+-- using forward differences.
 derivative :: RealFunction -> RealFunction
 derivative f x = (f (x + epsilon) - f x)/epsilon
 
--- returns an approximation of the derivative using the symmetric difference
--- quotient
+-- | returns an approximation of the derivative using the symmetric
+-- difference quotient.
 derivative2 :: RealFunction -> RealFunction
 derivative2 f x = (f (x + epsilon) - f (x - epsilon)) / (2*epsilon)
 
--- finite central differences
+-- finite central differences.
 derivative3 :: RealFunction -> RealFunction
 derivative3 f x = (d - 8*c + 8*b - a)/(12*epsilon)
       where
@@ -149,6 +128,7 @@ derivative3 f x = (d - 8*c + 8*b - a)/(12*epsilon)
       c = f (x - epsilon)
       d = f (x - 2*epsilon)
 
+-- | returns the second derivative of a function.
 deriv_second :: RealFunction -> RealFunction
 deriv_second f x = (f (x + epsilon) - 2*f(x) + f(x - epsilon) ) / epsilon**2
 
@@ -171,15 +151,16 @@ map2D :: RealFunction -> RealFunction -> (Double,Double) -> (Double, Double)
 map2D fx fy (x, y) = (fx x, fy y)
 
 -- update
-updateBall :: Ball -> Double -> Ball
-updateBall (Ball m f p v) dt = Ball m f p v
-  where
-    acceleration = force / m
-    force = 5
+-- updateBall :: Ball -> Double -> Ball
+-- updateBall (Ball m f p v) _ = Ball m f p v
+--  where
+--    acceleration = force / m
+--    force = 5
 
 -- view
 
 -- model
+initBall :: Ball
 initBall = Ball 5 (0,0) (0, 0) (1, 0)
 
 -- eulerIter
@@ -241,12 +222,12 @@ eulerModified f y0 x0 = y0 + h/2 * ( yp0 + yp1)
 mag :: [Double] -> Double
 mag [] = 0
 mag v = sqrt(sumsqr)
-  where sumsqr = foldr (\x y -> x^2 + y) 0 v
+  where sumsqr = foldr (\x y -> x**2 + y) 0 v
 
 dot :: [Double] -> [Double] -> Maybe Double
 dot [] [] = Just 0.0
-dot (x:xs) [] = Nothing
-dot [] (x:xs) = Nothing
+dot _ [] = Nothing
+dot [] _ = Nothing
 dot (x:xs) (y:ys) =  case dot xs ys of
    Just r -> Just(x * y + r)
    Nothing -> Nothing
