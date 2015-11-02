@@ -28,6 +28,19 @@ data Vector a = Vector a a a deriving (Show, Eq)
 instance Functor Vector where
   fmap f (Vector a b c) = Vector (f a) (f b) (f c)
 
+data Color = Red | Black deriving Show
+data RedblackTree = E | RedblackTree Color RedblackTree Integer RedblackTree deriving (Show)
+
+member :: Integer -> RedblackTree -> Bool
+member _ E = False
+member x (RedblackTree _ a y b)
+   | x < y = member x a
+   | x > y = member x b
+   | otherwise = True
+
+e1 :: RedblackTree
+e1 = RedblackTree Black (RedblackTree Red E 5 E) 6 (RedblackTree Red E 40 E)
+
 --instance Applicative Vector where
 --  pure = Vector
 
