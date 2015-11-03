@@ -1,4 +1,4 @@
-{-# LANGUAGE Haskell2010, TemplateHaskell, QuasiQuotes, CPP #-}
+{-# LANGUAGE Haskell2010, CPP #-}
 
 module NumericalMethods.Simple where
 
@@ -10,7 +10,7 @@ gravityAccel = 9.8
 
 printAngle :: Maybe Double -> String
 printAngle x = case x of
-             Just r -> show (r)
+             Just r -> show r
              Nothing -> "Bad angles"
 
 epsilon :: Double
@@ -56,10 +56,10 @@ balance color a x b = T color a x b
 insertElement :: Ord a => a -> RedblackTree a -> RedblackTree a
 insertElement x s = T Black a y b
                 where ins E = T Red E x E
-                      ins s@(T color a y b) =
-                          if x < y then balance color (ins a) y b
-                          else if x > y then balance color a y (ins b)
-                          else s
+                      ins s@(T color a y b)  
+                          | x < y = balance color (ins a) y b
+                          | x > y = balance color a y (ins b)
+                          | otherwise = s
                       T _ a y b = ins s
 
 
