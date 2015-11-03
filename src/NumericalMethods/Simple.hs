@@ -29,25 +29,42 @@ instance Functor Vector where
   fmap f (Vector a b c) = Vector (f a) (f b) (f c)
 
 data Color = Red | Black deriving Show
-data RedblackTree = E
-  | RedblackTree Color RedblackTree Integer RedblackTree deriving Show
+data RedblackTree a = E
+  | T Color (RedblackTree a) a (RedblackTree a) deriving Show
 
-member :: Integer -> RedblackTree -> Bool
+member :: Ord a => a -> RedblackTree a -> Bool
 member _ E = False
-member x (RedblackTree _ a y b)
+member x (T _ a y b)
    | x < y = member x a
    | x > y = member x b
    | otherwise = True
 
-insertElement :: Integer -> RedblackTree -> RedblackTree
-insertElement x E = RedblackTree Red E x E
-insertElement x (RedblackTree c l y r)
-  | x < y = RedblackTree c (insertElement x l) y r
-  | x > y = RedblackTree c l y (insertElement x r)
-  | otherwise = RedblackTree c l y r
+-- insertElement :: Integer -> RedblackTree -> RedblackTree
+-- insertElement x E = RedblackTree Red E x E
+-- insertElement x (RedblackTree c l y r)
+--  | x < y = RedblackTree c (insertElement x l) y r
+--  | x > y = RedblackTree c l y (insertElement x r)
+--  | otherwise = RedblackTree c l y r
 
-e1 :: RedblackTree
-e1 = RedblackTree Black (RedblackTree Red E 5 E) 6 (RedblackTree Red E 40 E)
+balance :: Ord a => Color -> RedblackTree a -> a -> RedblackTree a -> RedblackTree a 
+balance Black (T Red (T Red a x b) y c) z d = T Red (T Black a x b) y (T Black c z d)
+balance Black (T Red a x (T Red b y c)) z d = T Red (T Black a x b) y (T Black c z d)
+balance Black a x (T Red (T Red b y c) z d) = T Red (T Black a x b) y (T Black c z d)
+balance Black a x (T Red b y (T Red c z d)) = T Red (T Black a x b) y (T Black c z d)
+balance color a x b = T color a x b
+    
+insertElement :: Ord a => a -> RedblackTree a -> RedblackTree a
+insertElement x s = T Black a y b
+                where ins E = T Red E x E
+                      ins s@(T color a y b) =
+                          if x < y then balance color (ins a) y b
+                          else if x > y then balance color a y (ins b)
+                          else s
+                      T _ a y b = ins s
+
+
+e1 :: RedblackTree Integer
+e1 = T Black (T Red E 5 E) 6 (T Red E 40 E)
 
 
 --instance Applicative Vector where
