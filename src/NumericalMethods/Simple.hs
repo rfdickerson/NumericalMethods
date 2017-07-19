@@ -134,6 +134,14 @@ newtonRaphson guess f
     difference = abs(newguess - guess)
     fprime = derivative f
 
+newtonRaphson2 :: Double -> (Double -> Double) -> (Double -> Double) -> Double
+newtonRaphson2 guess f fprime
+  | difference <= epsilon = newguess
+  | otherwise = newtonRaphson2 newguess f fprime
+  where
+    newguess = guess - (f guess)/(fprime guess)
+    difference = abs(newguess - guess)
+
 -- | Newton's method for finding optimization of functions.
 optimize :: RealFunction -> Double -> Double
 optimize f guess = newtonRaphson guess g

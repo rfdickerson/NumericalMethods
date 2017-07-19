@@ -4,8 +4,8 @@ Synopsis:       Used to learn how to do numerical methods.
 License:        MIT
 License-File:   LICENSE
 Cabal-Version:  >= 1.8
-Author:         Robert F. Dickerson <rfdickerson@us.ibm.com>
-Maintainer:     Robert F. Dickerson <rfdickerson@us.ibm.com>
+Author:         Robert F. Dickerson <rfdickerson@gmail.com>
+Maintainer:     Robert F. Dickerson <rfdickerson@gmail.com>
 Stability:      experimental
 Build-Type:     Simple
 
